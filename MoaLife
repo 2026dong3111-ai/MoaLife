@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeHub - 생활 유용 도구 모음</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Noto Sans KR) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .tab-btn.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+            background-color: #eff6ff;
+        }
+        /* Water Wave Effect */
+        .water-container {
+            position: relative;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="text-slate-800 flex flex-col min-h-screen bg-slate-50">
+
+    <!-- Global Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xl shadow-md shadow-blue-200">
+                    <i class="fa-solid fa-cubes"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight text-slate-800">LifeHub <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium ml-1">v1.0</span></h1>
+                    <p class="text-xs text-slate-500 hidden sm:block">스마트한 일상을 위한 올인원 유용 도구 모음</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <div class="text-right hidden sm:block">
+                    <div id="current-date-str" class="text-xs font-semibold text-slate-700">2026. 09. 29 (화)</div>
+                    <div id="current-time-str" class="text-xs text-slate-400 font-mono">11:52 AM</div>
+                </div>
+                <button onclick="resetAllData()" title="데이터 초기화" class="p-2 text-slate-400 hover:text-red-500 hover:bg-slate-100 rounded-lg transition-colors text-sm">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="max-w-6xl mx-auto px-2 flex overflow-x-auto no-scrollbar border-t border-slate-100 text-sm font-medium">
+            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn active px-4 py-3 border-b-2 border-transparent flex items-center space-x-2 whitespace-nowrap transition-all">
+                <i class="fa-solid fa-house"></i>
+                <span>대시보드</span>
+            </button>
+            <button onclick="switchTab('todo')" id="tab-todo" class="tab-btn px-4 py-3 border-b-2 border-transparent flex items-center space-x-2 whitespace-nowrap transition-all">
+                <i class="fa-solid fa-list-check"></i>
+                <span>할일 & 습관</span>
+            </button>
+            <button onclick="switchTab('budget')" id="tab-budget" class="tab-btn px-4 py-3 border-b-2 border-transparent flex items-center space-x-2 whitespace-nowrap transition-all">
+                <i class="fa-solid fa-wallet"></i>
+                <span>간편 가계부</span>
+            </button>
+            <button onclick="switchTab('roulette')" id="tab-roulette" class="tab-btn px-4 py-3 border-b-2 border-transparent flex items-center space-x-2 whitespace-nowrap transition-all">
+                <i class="fa-solid fa-circle-notch"></i>
+                <span>결정 룰렛</span>
+            </button>
+            <button onclick="switchTab('pomodoro')" id="tab-pomodoro" class="tab-btn px-4 py-3 border-b-2 border-transparent flex items-center space-x-2 whitespace-nowrap transition-all">
+                <i class="fa-solid fa-stopwatch"></i>
+                <span>포모도로</span>
+            </button>
+            <button onclick="switchTab('dday')" id="tab-dday" class="tab-btn px-4 py-3 border-b-2 border-transparent flex items-center space-x-2 whitespace-nowrap transition-all">
+                <i class="fa-solid fa-calendar-day"></i>
+                <span>디데이</span>
+            </button>
+            <button onclick="switchTab('converter')" id="tab-converter" class="tab-btn px-4 py-3 border-b-2 border-transparent flex items-center space-x-2 whitespace-nowrap transition-all">
+                <i class="fa-solid fa-calculator"></i>
+                <span>계산/변환기</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-6xl w-full mx-auto p-4 sm:p-6">
+
+        <!-- ==================== 1. DASHBOARD VIEW ==================== -->
+        <section id="view-dashboard" class="space-y-6">
+            <!-- Greeting Banner -->
+            <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                <div class="relative z-10">
+                    <h2 class="text-2xl font-bold mb-1" id="greeting-title">안녕하세요! 👋</h2>
+                    <p class="text-blue-100 text-sm max-w-xl" id="quote-text">"오늘의 조그만 노력이 내일의 커다란 변화를 만듭니다."</p>
+                </div>
+                <div class="absolute right-4 bottom-[-10px] opacity-20 text-8xl text-white pointer-events-none">
+                    <i class="fa-solid fa-sparkles"></i>
+                </div>
+            </div>
+
+            <!-- Summary Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <!-- Today's Todo Progress Card -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">오늘의 할 일</span>
+                            <span id="dash-todo-count" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md">0 / 0</span>
+                        </div>
+                        <div class="flex items-baseline space-x-2 mb-2">
+                            <span id="dash-todo-percent" class="text-3xl font-extrabold text-slate-800">0%</span>
+                            <span class="text-xs text-slate-500">달성 완료</span>
+                        </div>
+                        <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden mb-4">
+                            <div id="dash-todo-bar" class="bg-blue-600 h-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <button onclick="switchTab('todo')" class="w-full py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-semibold rounded-xl transition-colors flex items-center justify-center space-x-1">
+                        <span>할 일 추가/관리하기</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </button>
+                </div>
+
+                <!-- Water Intake Tracker Card -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">오늘의 수분 섭취</span>
+                            <span class="text-xs text-cyan-600 font-semibold"><i class="fa-solid fa-droplet mr-1"></i>목표: 2,000ml</span>
+                        </div>
+                        <div class="flex items-baseline justify-between mb-3">
+                            <div>
+                                <span id="water-intake-val" class="text-3xl font-extrabold text-slate-800">0</span>
+                                <span class="text-sm font-medium text-slate-500">ml</span>
+                            </div>
+                            <span id="water-cups-count" class="text-xs text-slate-400">0 / 8 잔</span>
+                        </div>
+                        <!-- Water visual bar -->
+                        <div class="w-full bg-cyan-50 h-3 rounded-full overflow-hidden mb-4 p-0.5 border border-cyan-100">
+                            <div id="water-progress-bar" class="bg-cyan-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="addWater(250)" class="flex-1 py-2 bg-cyan-500 hover:bg-cyan-600 active:scale-95 text-white text-xs font-semibold rounded-xl transition-all shadow-sm shadow-cyan-200 flex items-center justify-center space-x-1">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>1잔 (+250ml)</span>
+                        </button>
+                        <button onclick="resetWater()" class="px-3 py-2 text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors text-xs">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Main D-Day Highlight Card -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">다카오고 있는 디데이</span>
+                            <i class="fa-solid fa-star text-amber-400 text-xs"></i>
+                        </div>
+                        <div id="dash-dday-content">
+                            <p class="text-xs text-slate-400 py-4 text-center">등록된 디데이가 없습니다.</p>
+                        </div>
+                    </div>
+                    <button onclick="switchTab('dday')" class="w-full py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-semibold rounded-xl transition-colors flex items-center justify-center space-x-1">
+                        <span>디데이 전체보기</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Action Grid -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">빠른 도구 실행</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <button onclick="switchTab('roulette')" class="p-4 rounded-xl border border-slate-100 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-200 group transition-all text-left">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-utensils"></i>
+                        </div>
+                        <div class="font-bold text-sm text-slate-700 group-hover:text-indigo-600">오늘 뭐 먹지?</div>
+                        <div class="text-xs text-slate-400">메뉴 결정 룰렛</div>
+                    </button>
+
+                    <button onclick="switchTab('pomodoro')" class="p-4 rounded-xl border border-slate-100 bg-slate-50 hover:bg-rose-50 hover:border-rose-200 group transition-all text-left">
+                        <div class="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-brain"></i>
+                        </div>
+                        <div class="font-bold text-sm text-slate-700 group-hover:text-rose-600">포모도로 타임</div>
+                        <div class="text-xs text-slate-400">25분 집중 타이머</div>
+                    </button>
+
+                    <button onclick="switchTab('converter')" class="p-4 rounded-xl border border-slate-100 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-200 group transition-all text-left">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-users-viewfinder"></i>
+                        </div>
+                        <div class="font-bold text-sm text-slate-700 group-hover:text-emerald-600">더치페이 N빵</div>
+                        <div class="text-xs text-slate-400">모임 비용 깔끔 계산</div>
+                    </button>
+
+                    <button onclick="switchTab('budget')" class="p-4 rounded-xl border border-slate-100 bg-slate-50 hover:bg-amber-50 hover:border-amber-200 group transition-all text-left">
+                        <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-coins"></i>
+                        </div>
+                        <div class="font-bold text-sm text-slate-700 group-hover:text-amber-600">오늘의 지출</div>
+                        <div class="text-xs text-slate-400">빠른 가계부 입력</div>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==================== 2. TODO & HABIT VIEW ==================== -->
+        <section id="view-todo" class="hidden space-y-6">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800">할 일 & 습관 리스트</h2>
+                        <p class="text-xs text-slate-500">오늘 할 일과 매일 반복할 습관을 등록하고 체크해보세요.</p>
+                    </div>
+                    <!-- Filter buttons -->
+                    <div class="flex bg-slate-100 p-1 rounded-xl text-xs font-medium self-start sm:self-auto">
+                        <button onclick="filterTodo('all')" id="filter-all" class="px-3 py-1.5 rounded-lg bg-white shadow-sm text-slate-800">전체</button>
+                        <button onclick="filterTodo('active')" id="filter-active" class="px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-800">진행중</button>
+                        <button onclick="filterTodo('completed')" id="filter-completed" class="px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-800">완료</button>
+                    </div>
+                </div>
+
+                <!-- Input Input bar -->
+                <form onsubmit="handleTodoSubmit(event)" class="flex gap-2 mb-6">
+                    <input type="text" id="todo-input" placeholder="새로운 할 일 또는 습관을 입력하세요..." required
+                           class="flex-1 bg-slate-50 border border-slate-200 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+                    <select id="todo-category" class="bg-slate-50 border border-slate-200 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="일반">일반</option>
+                        <option value="업무">업무</option>
+                        <option value="건강">건강</option>
+                        <option value="공부">공부</option>
+                    </select>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-xl px-5 py-2.5 transition-colors shadow-sm shadow-blue-200 flex items-center space-x-1">
+                        <i class="fa-solid fa-plus"></i>
+                        <span class="hidden sm:inline">추가</span>
+                    </button>
+                </form>
+
+                <!-- List Output -->
+                <div id="todo-list" class="space-y-2">
+                    <!-- Dynamic Items render here -->
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==================== 3. BUDGET TRACKER VIEW ==================== -->
+        <section id="view-budget" class="hidden space-y-6">
+            <!-- Stats Top Row -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="text-xs font-medium text-slate-400 mb-1">총 수입</div>
+                    <div id="budget-total-income" class="text-2xl font-bold text-emerald-600">0 원</div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="text-xs font-medium text-slate-400 mb-1">총 지출</div>
+                    <div id="budget-total-expense" class="text-2xl font-bold text-rose-600">0 원</div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="text-xs font-medium text-slate-400 mb-1">순 잔액</div>
+                    <div id="budget-net-balance" class="text-2xl font-bold text-slate-800">0 원</div>
+                </div>
+            </div>
+
+            <!-- Main Input & Table Container -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Add Form -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm h-fit">
+                    <h3 class="text-base font-bold text-slate-800 mb-4">내역 추가</h3>
+                    <form onsubmit="handleBudgetSubmit(event)" class="space-y-4 text-xs">
+                        <div>
+                            <label class="block font-medium text-slate-600 mb-1">구분</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="border border-slate-200 rounded-xl p-2.5 flex items-center justify-center space-x-2 cursor-pointer has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50 has-[:checked]:text-rose-600 transition-all">
+                                    <input type="radio" name="budget-type" value="expense" checked class="hidden">
+                                    <i class="fa-solid fa-minus-circle"></i>
+                                    <span class="font-bold">지출</span>
+                                </label>
+                                <label class="border border-slate-200 rounded-xl p-2.5 flex items-center justify-center space-x-2 cursor-pointer has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 has-[:checked]:text-emerald-600 transition-all">
+                                    <input type="radio" name="budget-type" value="income" class="hidden">
+                                    <i class="fa-solid fa-plus-circle"></i>
+                                    <span class="font-bold">수입</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-medium text-slate-600 mb-1">금액 (원)</label>
+                            <input type="number" id="budget-amount" placeholder="예: 12000" required min="1"
+                                   class="w-full bg-slate-50 border border-slate-200 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <div>
+                            <label class="block font-medium text-slate-600 mb-1">카테고리</label>
+                            <select id="budget-category" class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="식비">🍽️ 식비</option>
+                                <option value="교통">🚌 교통</option>
+                                <option value="쇼핑">🛍️ 쇼핑</option>
+                                <option value="문화/체험">🎬 문화/체험</option>
+                                <option value="월급/수입">💰 월급/수입</option>
+                                <option value="기타">📌 기타</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block font-medium text-slate-600 mb-1">내용 / 메모</label>
+                            <input type="text" id="budget-memo" placeholder="예: 점심 돈까스" required
+                                   class="w-full bg-slate-50 border border-slate-200 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl transition-colors shadow-sm">
+                            내역 저장
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Transaction History List -->
+                <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-base font-bold text-slate-800">최근 입출금 내역</h3>
+                            <span id="budget-count-badge" class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-md font-medium">0건</span>
+                        </div>
+                        <div id="budget-list" class="space-y-2 max-h-[380px] overflow-y-auto pr-1">
+                            <!-- Transactions rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==================== 4. DECISION ROULETTE VIEW ==================== -->
+        <section id="view-roulette" class="hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Roulette Canvas Section -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-center relative">
+                    <h2 class="text-lg font-bold text-slate-800 mb-1">결정 장애 해결 룰렛</h2>
+                    <p class="text-xs text-slate-500 mb-6 text-center">오늘 먹을 메뉴나 고민 중인 옵션을 넣고 돌려보세요!</p>
+
+                    <!-- Arrow Pointer -->
+                    <div class="relative flex flex-col items-center">
+                        <div class="w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[24px] border-t-rose-500 z-20 -mb-3 filter drop-shadow"></div>
+                        <!-- Canvas Wheel -->
+                        <canvas id="roulette-canvas" width="340" height="340" class="max-w-full h-auto drop-shadow-md rounded-full"></canvas>
+                    </div>
+
+                    <button onclick="spinRoulette()" id="spin-btn" class="mt-6 px-10 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-base rounded-2xl shadow-lg shadow-indigo-200 hover:scale-105 active:scale-95 transition-all">
+                        <i class="fa-solid fa-play mr-2"></i>룰렛 돌리기!
+                    </button>
+                </div>
+
+                <!-- Options Control Panel -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-base font-bold text-slate-800">옵션 설정</h3>
+
+                    <!-- Quick Preset Buttons -->
+                    <div>
+                        <span class="text-xs font-semibold text-slate-400 block mb-2">프리셋 불러오기</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button onclick="loadRoulettePreset('food')" class="text-xs px-2.5 py-1 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors">🍱 점심 메뉴</button>
+                            <button onclick="loadRoulettePreset('yesno')" class="text-xs px-2.5 py-1 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors">⭕ YES / NO</button>
+                            <button onclick="loadRoulettePreset('activity')" class="text-xs px-2.5 py-1 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors">🎮 주말 할일</button>
+                        </div>
+                    </div>
+
+                    <!-- Option Add Form -->
+                    <form onsubmit="addRouletteOption(event)" class="flex gap-2">
+                        <input type="text" id="roulette-input" placeholder="항목 입력..." required
+                               class="flex-1 bg-slate-50 border border-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3 py-2 rounded-xl transition-colors">
+                            추가
+                        </button>
+                    </form>
+
+                    <!-- Items List -->
+                    <div id="roulette-items-list" class="space-y-1.5 max-h-[220px] overflow-y-auto pr-1 text-xs">
+                        <!-- Options items here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==================== 5. POMODORO TIMER VIEW ==================== -->
+        <section id="view-pomodoro" class="hidden space-y-6 max-w-xl mx-auto">
+            <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col items-center text-center">
+                <!-- Mode Switch Tabs -->
+                <div class="flex bg-slate-100 p-1.5 rounded-2xl mb-8 text-xs font-semibold">
+                    <button onclick="setPomoMode('focus')" id="pomo-mode-focus" class="px-4 py-2 rounded-xl bg-white text-rose-600 shadow-sm transition-all">🔥 집중 (25분)</button>
+                    <button onclick="setPomoMode('shortBreak')" id="pomo-mode-short" class="px-4 py-2 rounded-xl text-slate-500 hover:text-slate-800 transition-all">☕ 짧은 휴식 (5분)</button>
+                    <button onclick="setPomoMode('longBreak')" id="pomo-mode-long" class="px-4 py-2 rounded-xl text-slate-500 hover:text-slate-800 transition-all">🌴 긴 휴식 (15분)</button>
+                </div>
+
+                <!-- Timer Circle Display -->
+                <div class="relative w-64 h-64 flex items-center justify-center mb-8">
+                    <!-- SVG Ring -->
+                    <svg class="w-full h-full transform -rotate-90">
+                        <circle cx="128" cy="128" r="110" stroke="#f1f5f9" stroke-width="12" fill="transparent" />
+                        <circle id="pomo-progress-ring" cx="128" cy="128" r="110" stroke="#f43f5e" stroke-width="12" fill="transparent"
+                                stroke-dasharray="691.15" stroke-dashoffset="0" stroke-linecap="round" class="transition-all duration-1000" />
+                    </svg>
+                    <!-- Digital Time Display -->
+                    <div class="absolute flex flex-col items-center">
+                        <span id="pomo-time-display" class="text-5xl font-black font-mono tracking-tight text-slate-800">25:00</span>
+                        <span id="pomo-status-label" class="text-xs font-semibold text-rose-500 uppercase tracking-widest mt-1">집중 시간</span>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="flex items-center space-x-4">
+                    <button onclick="togglePomoTimer()" id="pomo-start-btn" class="w-16 h-16 bg-rose-500 hover:bg-rose-600 active:scale-95 text-white rounded-2xl shadow-lg shadow-rose-200 flex items-center justify-center text-xl transition-all">
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                    <button onclick="resetPomoTimer()" class="w-12 h-12 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-2xl flex items-center justify-center text-base transition-colors">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+
+                <!-- Completed Stats -->
+                <div class="mt-8 pt-6 border-t border-slate-100 w-full flex justify-around text-center">
+                    <div>
+                        <div class="text-xs text-slate-400">오늘 달성 사이클</div>
+                        <div id="pomo-completed-count" class="text-xl font-bold text-slate-700 mt-0.5">0 회</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-400">총 집중 시간</div>
+                        <div id="pomo-total-minutes" class="text-xl font-bold text-slate-700 mt-0.5">0 분</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==================== 6. D-DAY TRACKER VIEW ==================== -->
+        <section id="view-dday" class="hidden space-y-6">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800">디데이 & 기념일</h2>
+                        <p class="text-xs text-slate-500">중요한 시험, 여행, 기념일을 잊지 않게 계산해 드립니다.</p>
+                    </div>
+                    <button onclick="openDdayModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs px-4 py-2.5 rounded-xl transition-colors flex items-center space-x-1 shadow-sm shadow-blue-200">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>디데이 등록</span>
+                    </button>
+                </div>
+
+                <!-- Dday Cards Grid -->
+                <div id="dday-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Cards will be populated here -->
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==================== 7. CONVERTER & CALCULATOR VIEW ==================== -->
+        <section id="view-converter" class="hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- 1. Dutch Pay Splitter Calculator -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm">
+                            <i class="fa-solid fa-calculator"></i>
+                        </div>
+                        <h3 class="text-base font-bold text-slate-800">더치페이 (N빵) 계산기</h3>
+                    </div>
+
+                    <div class="space-y-3 text-xs">
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">총 금액 (원)</label>
+                            <input type="number" id="dutch-total" placeholder="예: 85000" oninput="calculateDutch()"
+                                   class="w-full bg-slate-50 border border-slate-200 text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-semibold text-slate-600 mb-1">인원 수 (명)</label>
+                                <input type="number" id="dutch-people" value="2" min="1" oninput="calculateDutch()"
+                                       class="w-full bg-slate-50 border border-slate-200 text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-600 mb-1">절사 단위</label>
+                                <select id="dutch-round" onchange="calculateDutch()" class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                    <option value="1">절사 없음 (원 단위)</option>
+                                    <option value="100" selected>100원 단위 올림</option>
+                                    <option value="1000">1,000원 단위 올림</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Calculated Result Display -->
+                        <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 mt-4 text-center">
+                            <div class="text-xs text-emerald-700 font-medium">1인당 부담 금액</div>
+                            <div id="dutch-result" class="text-3xl font-black text-emerald-700 my-1">0 원</div>
+                            <div id="dutch-remainder-note" class="text-[11px] text-emerald-600 hidden"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Cooking Scale & Unit Converter -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
+                        <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-sm">
+                            <i class="fa-solid fa-utensils"></i>
+                        </div>
+                        <h3 class="text-base font-bold text-slate-800">요리 계량 & 단위 변환기</h3>
+                    </div>
+
+                    <div class="space-y-4 text-xs">
+                        <!-- Quick Recipe Info Cards -->
+                        <div class="grid grid-cols-3 gap-2 text-center">
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                <div class="font-bold text-amber-600 text-sm">1 큰술 (Tbsp)</div>
+                                <div class="text-[11px] text-slate-500">15 ml / g</div>
+                            </div>
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                <div class="font-bold text-amber-600 text-sm">1 작은술 (tsp)</div>
+                                <div class="text-[11px] text-slate-500">5 ml / g</div>
+                            </div>
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                <div class="font-bold text-amber-600 text-sm">1 컵 (Cup)</div>
+                                <div class="text-[11px] text-slate-500">200 ml</div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 pt-2">
+                            <div>
+                                <label class="block font-semibold text-slate-600 mb-1">변환 종류 선택</label>
+                                <select id="unit-type" onchange="convertUnits()" class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                                    <option value="length">길이 (cm ↔ inch)</option>
+                                    <option value="weight">무게 (kg ↔ lb)</option>
+                                    <option value="temp">온도 (°C ↔ °F)</option>
+                                </select>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3 items-center">
+                                <div>
+                                    <label id="unit-input-label" class="block font-semibold text-slate-600 mb-1">입력 (cm)</label>
+                                    <input type="number" id="unit-input-val" value="10" oninput="convertUnits()"
+                                           class="w-full bg-slate-50 border border-slate-200 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                                </div>
+                                <div>
+                                    <label id="unit-output-label" class="block font-semibold text-slate-600 mb-1">변환 결과 (inch)</label>
+                                    <div id="unit-output-val" class="w-full bg-amber-50 border border-amber-200 text-slate-800 font-bold text-sm rounded-xl px-3 py-2">
+                                        3.94 inch
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- D-Day Add Modal -->
+    <div id="dday-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl space-y-4">
+            <h3 class="text-base font-bold text-slate-800">새 디데이 등록</h3>
+            <form onsubmit="handleDdaySubmit(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-600 mb-1">제목</label>
+                    <input type="text" id="dday-title" placeholder="예: 여름 휴가, 기말고사" required
+                           class="w-full bg-slate-50 border border-slate-200 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-600 mb-1">날짜</label>
+                    <input type="date" id="dday-date" required
+                           class="w-full bg-slate-50 border border-slate-200 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex space-x-2 pt-2">
+                    <button type="button" onclick="closeDdayModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl transition-colors">
+                        취소
+                    </button>
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition-colors shadow-sm shadow-blue-200">
+                        저장하기
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification Popup Container -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 text-white text-xs px-4 py-3 rounded-xl shadow-lg transition-all duration-300 opacity-0 transform translate-y-4 pointer-events-none z-50 flex items-center space-x-2">
+        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toast-msg">메시지 내용</span>
+    </div>
+
+
+    <script>
+        // Default App State with LocalStorage fallbacks
+        const DEFAULT_STATE = {
+            todos: [
+                { id: 1, text: '물 2L 마시기', category: '건강', completed: false },
+                { id: 2, text: '포모도로 2회 집중하기', category: '공부', completed: true }
+            ],
+            budget: [
+                { id: 1, type: 'expense', amount: 9000, category: '식비', memo: '점심 식사 (백반)', date: new Date().toLocaleDateString() },
+                { id: 2, type: 'income', amount: 3000000, category: '월급/수입', memo: '이번 달 급여', date: new Date().toLocaleDateString() }
+            ],
+            dday: [
+                { id: 1, title: '올해 연말 D-Day 🎄', date: '2026-12-25' }
+            ],
+            water: 0,
+            rouletteOptions: ['한식', '중식', '일식', '양식', '분식', '샐러드'],
+            pomoStats: { completed: 0, totalMinutes: 0 }
+        };
+
+        let state = JSON.parse(localStorage.getItem('lifehub_state')) || DEFAULT_STATE;
+
+        function saveState() {
+            localStorage.setItem('lifehub_state', JSON.stringify(state));
+            updateDashboardView();
+        }
+
+        // Notification Toast
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+            }, 2500);
+        }
+
+        // Reset Data
+        function resetAllData() {
+            if (confirm('모든 데이터를 초기화하시겠습니까?')) {
+                localStorage.removeItem('lifehub_state');
+                state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+                saveState();
+                initApp();
+                showToast('초기화가 완료되었습니다.');
+            }
+        }
+
+        function switchTab(tabId) {
+            // Hide all panels
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            // Show target
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+
+            if (tabId === 'roulette') {
+                drawRouletteWheel();
+            }
+        }
+
+        function updateLiveTime() {
+            const now = new Date();
+            const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short' };
+            document.getElementById('current-date-str').innerText = now.toLocaleDateString('ko-KR', dateOptions);
+            document.getElementById('current-time-str').innerText = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        }
+        setInterval(updateLiveTime, 1000);
+
+
+        function updateDashboardView() {
+            // 1. Todo Stats
+            const totalTodos = state.todos.length;
+            const completedTodos = state.todos.filter(t => t.completed).length;
+            const percent = totalTodos === 0 ? 0 : Math.round((completedTodos / totalTodos) * 100);
+
+            document.getElementById('dash-todo-count').innerText = `${completedTodos} / ${totalTodos}`;
+            document.getElementById('dash-todo-percent').innerText = `${percent}%`;
+            document.getElementById('dash-todo-bar').style.width = `${percent}%`;
+
+            // 2. Water Stats
+            const waterVal = state.water || 0;
+            const waterCups = Math.floor(waterVal / 250);
+            const waterPercent = Math.min(100, Math.round((waterVal / 2000) * 100));
+
+            document.getElementById('water-intake-val').innerText = waterVal.toLocaleString();
+            document.getElementById('water-cups-count').innerText = `${waterCups} / 8 잔`;
+            document.getElementById('water-progress-bar').style.width = `${waterPercent}%`;
+
+            // 3. Highlight D-Day
+            const ddayContainer = document.getElementById('dash-dday-content');
+            if (state.dday.length > 0) {
+                const closest = getDdayCalculation(state.dday[0].date);
+                ddayContainer.innerHTML = `
+                    <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <div>
+                            <div class="font-bold text-slate-800 text-sm">${escapeHtml(state.dday[0].title)}</div>
+                            <div class="text-xs text-slate-400">${state.dday[0].date}</div>
+                        </div>
+                        <span class="text-xl font-black ${closest.isPast ? 'text-slate-500' : 'text-blue-600'}">
+                            ${closest.text}
+                        </span>
+                    </div>
+                `;
+            } else {
+                ddayContainer.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center">등록된 디데이가 없습니다.</p>`;
+            }
+        }
+
+        function addWater(amount) {
+            state.water = (state.water || 0) + amount;
+            saveState();
+            showToast(`수분 섭취 +${amount}ml 기록! 💧`);
+        }
+
+        function resetWater() {
+            state.water = 0;
+            saveState();
+            showToast('수분 기록이 초기화되었습니다.');
+        }
+
+
+        let currentTodoFilter = 'all';
+
+        function renderTodos() {
+            const container = document.getElementById('todo-list');
+            container.innerHTML = '';
+
+            let items = state.todos;
+            if (currentTodoFilter === 'active') items = items.filter(t => !t.completed);
+            if (currentTodoFilter === 'completed') items = items.filter(t => t.completed);
+
+            if (items.length === 0) {
+                container.innerHTML = `<div class="text-center text-xs text-slate-400 py-8">등록된 할 일이 없습니다.</div>`;
+                return;
+            }
+
+            items.forEach(todo => {
+                const item = document.createElement('div');
+                item.className = `flex items-center justify-between p-3 rounded-xl border transition-all ${todo.completed ? 'bg-slate-50 border-slate-100 opacity-60' : 'bg-white border-slate-200 hover:border-blue-200'}`;
+                item.innerHTML = `
+                    <div class="flex items-center space-x-3 cursor-pointer" onclick="toggleTodo(${todo.id})">
+                        <div class="w-5 h-5 rounded-lg border ${todo.completed ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-300'} flex items-center justify-center text-xs">
+                            ${todo.completed ? '<i class="fa-solid fa-check"></i>' : ''}
+                        </div>
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">${todo.category}</span>
+                        <span class="text-sm font-medium ${todo.completed ? 'line-through text-slate-400' : 'text-slate-700'}">${escapeHtml(todo.text)}</span>
+                    </div>
+                    <button onclick="deleteTodo(${todo.id})" class="text-slate-300 hover:text-red-500 p-1 text-xs transition-colors">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function handleTodoSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('todo-input');
+            const category = document.getElementById('todo-category').value;
+
+            if (!input.value.trim()) return;
+
+            state.todos.unshift({
+                id: Date.now(),
+                text: input.value.trim(),
+                category: category,
+                completed: false
+            });
+
+            input.value = '';
+            saveState();
+            renderTodos();
+            showToast('할 일이 추가되었습니다.');
+        }
+
+        function toggleTodo(id) {
+            state.todos = state.todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+            saveState();
+            renderTodos();
+        }
+
+        function deleteTodo(id) {
+            state.todos = state.todos.filter(t => t.id !== id);
+            saveState();
+            renderTodos();
+            showToast('할 일이 삭제되었습니다.');
+        }
+
+        function filterTodo(type) {
+            currentTodoFilter = type;
+            ['all', 'active', 'completed'].forEach(f => {
+                const btn = document.getElementById(`filter-${f}`);
+                if (f === type) {
+                    btn.className = 'px-3 py-1.5 rounded-lg bg-white shadow-sm text-slate-800';
+                } else {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-800';
+                }
+            });
+            renderTodos();
+        }
+
+
+        function renderBudget() {
+            const listContainer = document.getElementById('budget-list');
+            listContainer.innerHTML = '';
+
+            let totalIncome = 0;
+            let totalExpense = 0;
+
+            state.budget.forEach(item => {
+                if (item.type === 'income') totalIncome += item.amount;
+                if (item.type === 'expense') totalExpense += item.amount;
+
+                const row = document.createElement('div');
+                row.className = 'flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-white transition-all text-xs';
+                row.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold ${item.type === 'income' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}">
+                            <i class="fa-solid ${item.type === 'income' ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-700">${escapeHtml(item.memo)}</div>
+                            <div class="text-[11px] text-slate-400">${item.category} • ${item.date}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="font-extrabold ${item.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}">
+                            ${item.type === 'income' ? '+' : '-'}${item.amount.toLocaleString()} 원
+                        </span>
+                        <button onclick="deleteBudgetItem(${item.id})" class="text-slate-300 hover:text-rose-500 p-1 transition-colors">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                `;
+                listContainer.appendChild(row);
+            });
+
+            document.getElementById('budget-total-income').innerText = `${totalIncome.toLocaleString()} 원`;
+            document.getElementById('budget-total-expense').innerText = `${totalExpense.toLocaleString()} 원`;
+            document.getElementById('budget-net-balance').innerText = `${(totalIncome - totalExpense).toLocaleString()} 원`;
+            document.getElementById('budget-count-badge').innerText = `${state.budget.length}건`;
+        }
+
+        function handleBudgetSubmit(e) {
+            e.preventDefault();
+            const amountInput = document.getElementById('budget-amount');
+            const memoInput = document.getElementById('budget-memo');
+            const categorySelect = document.getElementById('budget-category');
+            const typeRadio = document.querySelector('input[name="budget-type"]:checked').value;
+
+            if (!amountInput.value || !memoInput.value) return;
+
+            state.budget.unshift({
+                id: Date.now(),
+                type: typeRadio,
+                amount: parseInt(amountInput.value, 10),
+                category: categorySelect.value,
+                memo: memoInput.value.trim(),
+                date: new Date().toLocaleDateString()
+            });
+
+            amountInput.value = '';
+            memoInput.value = '';
+            saveState();
+            renderBudget();
+            showToast('가계부 내역이 추가되었습니다.');
+        }
+
+        function deleteBudgetItem(id) {
+            state.budget = state.budget.filter(b => b.id !== id);
+            saveState();
+            renderBudget();
+            showToast('내역이 삭제되었습니다.');
+        }
+
+
+        let isSpinning = false;
+        let currentRotation = 0;
+
+        const ROULETTE_COLORS = ['#f87171', '#fb923c', '#fbbf24', '#34d399', '#38bdf8', '#818cf8', '#c084fc', '#f472b6'];
+
+        function drawRouletteWheel() {
+            const canvas = document.getElementById('roulette-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const numOptions = state.rouletteOptions.length;
+            const radius = canvas.width / 2;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (numOptions === 0) {
+                ctx.fillStyle = '#cbd5e1';
+                ctx.beginPath();
+                ctx.arc(radius, radius, radius - 10, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#64748b';
+                ctx.font = 'bold 14px "Noto Sans KR"';
+                ctx.textAlign = 'center';
+                ctx.fillText('옵션을 추가해주세요', radius, radius);
+                return;
+            }
+
+            const arcSize = (Math.PI * 2) / numOptions;
+
+            ctx.save();
+            ctx.translate(radius, radius);
+            ctx.rotate(currentRotation);
+
+            for (let i = 0; i < numOptions; i++) {
+                const angle = i * arcSize;
+                ctx.fillStyle = ROULETTE_COLORS[i % ROULETTE_COLORS.length];
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, radius - 5, angle, angle + arcSize);
+                ctx.lineTo(0, 0);
+                ctx.fill();
+
+                // Text label
+                ctx.save();
+                ctx.fillStyle = '#ffffff';
+                ctx.rotate(angle + arcSize / 2);
+                ctx.textAlign = 'right';
+                ctx.font = 'bold 13px "Noto Sans KR"';
+                ctx.fillText(state.rouletteOptions[i], radius - 25, 5);
+                ctx.restore();
+            }
+
+            // Center Pin Circle
+            ctx.beginPath();
+            ctx.arc(0, 0, 24, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.restore();
+            renderRouletteItemsList();
+        }
+
+        function spinRoulette() {
+            if (isSpinning || state.rouletteOptions.length < 2) {
+                if (state.rouletteOptions.length < 2) showToast('최소 2개 이상의 옵션이 필요합니다.');
+                return;
+            }
+
+            isSpinning = true;
+            document.getElementById('spin-btn').disabled = true;
+
+            const extraSpins = 5 + Math.random() * 5;
+            const totalRotation = extraSpins * Math.PI * 2 + Math.random() * Math.PI * 2;
+            const duration = 4000;
+            const start = performance.now();
+            const initialRotation = currentRotation;
+
+            function animate(time) {
+                const elapsed = time - start;
+                const progress = Math.min(elapsed / duration, 1);
+                // Ease out cubic
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+
+                currentRotation = initialRotation + totalRotation * easeOut;
+                drawRouletteWheel();
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    isSpinning = false;
+                    document.getElementById('spin-btn').disabled = false;
+
+                    // Calculate selected item (pointer is at top = -90 deg / 1.5 * PI)
+                    const numOptions = state.rouletteOptions.length;
+                    const normalizedRotation = (currentRotation % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+                    // Pointing at top angle (-Math.PI / 2)
+                    let winnerIndex = Math.floor((Math.PI * 2 - (normalizedRotation - Math.PI / 2)) % (Math.PI * 2) / ((Math.PI * 2) / numOptions));
+                    if (winnerIndex < 0) winnerIndex += numOptions;
+
+                    const winningOption = state.rouletteOptions[winnerIndex];
+                    playAudioBeep(800, 0.2);
+                    showToast(`🎉 당첨 결과: [ ${winningOption} ] !`);
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        function addRouletteOption(e) {
+            e.preventDefault();
+            const input = document.getElementById('roulette-input');
+            if (!input.value.trim()) return;
+
+            state.rouletteOptions.push(input.value.trim());
+            input.value = '';
+            saveState();
+            drawRouletteWheel();
+        }
+
+        function removeRouletteOption(index) {
+            state.rouletteOptions.splice(index, 1);
+            saveState();
+            drawRouletteWheel();
+        }
+
+        function renderRouletteItemsList() {
+            const list = document.getElementById('roulette-items-list');
+            list.innerHTML = '';
+            state.rouletteOptions.forEach((opt, idx) => {
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-lg';
+                div.innerHTML = `
+                    <span class="font-medium text-slate-700">${escapeHtml(opt)}</span>
+                    <button onclick="removeRouletteOption(${idx})" class="text-slate-300 hover:text-red-500">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function loadRoulettePreset(type) {
+            if (type === 'food') state.rouletteOptions = ['한식', '중식', '일식', '양식', '분식', '치킨', '피자', '햄버거'];
+            if (type === 'yesno') state.rouletteOptions = ['네 (YES)', '아니오 (NO)', '다시 돌리기'];
+            if (type === 'activity') state.rouletteOptions = ['영화 보기', '운동하기', '독서', '낮잠 자기', '산책', '게임'];
+            saveState();
+            drawRouletteWheel();
+            showToast('프리셋이 적용되었습니다.');
+        }
+
+
+        let pomoInterval = null;
+        let pomoSecondsLeft = 25 * 60;
+        let pomoTotalDuration = 25 * 60;
+        let pomoIsRunning = false;
+        let pomoMode = 'focus'; // 'focus', 'shortBreak', 'longBreak'
+
+        function setPomoMode(mode) {
+            if (pomoIsRunning) resetPomoTimer();
+            pomoMode = mode;
+
+            const modeMap = {
+                focus: { sec: 25 * 60, label: '집중 시간', color: '#f43f5e', btnClass: 'bg-white text-rose-600 shadow-sm' },
+                shortBreak: { sec: 5 * 60, label: '짧은 휴식', color: '#10b981', btnClass: 'bg-white text-emerald-600 shadow-sm' },
+                longBreak: { sec: 15 * 60, label: '긴 휴식', color: '#3b82f6', btnClass: 'bg-white text-blue-600 shadow-sm' }
+            };
+
+            pomoSecondsLeft = modeMap[mode].sec;
+            pomoTotalDuration = modeMap[mode].sec;
+
+            document.getElementById('pomo-status-label').innerText = modeMap[mode].label;
+            document.getElementById('pomo-progress-ring').setAttribute('stroke', modeMap[mode].color);
+
+            // Tab button active styling
+            ['focus', 'short', 'long'].forEach(m => {
+                const btn = document.getElementById(`pomo-mode-${m}`);
+                btn.className = 'px-4 py-2 rounded-xl text-slate-500 hover:text-slate-800 transition-all';
+            });
+            const activeKey = mode === 'focus' ? 'focus' : (mode === 'shortBreak' ? 'short' : 'long');
+            document.getElementById(`pomo-mode-${activeKey}`).className = `px-4 py-2 rounded-xl ${modeMap[mode].btnClass} transition-all`;
+
+            updatePomoDisplay();
+        }
+
+        function togglePomoTimer() {
+            if (pomoIsRunning) {
+                clearInterval(pomoInterval);
+                pomoIsRunning = false;
+                document.getElementById('pomo-start-btn').innerHTML = '<i class="fa-solid fa-play"></i>';
+            } else {
+                pomoIsRunning = true;
+                document.getElementById('pomo-start-btn').innerHTML = '<i class="fa-solid fa-pause"></i>';
+                pomoInterval = setInterval(() => {
+                    pomoSecondsLeft--;
+                    updatePomoDisplay();
+
+                    if (pomoSecondsLeft <= 0) {
+                        clearInterval(pomoInterval);
+                        pomoIsRunning = false;
+                        document.getElementById('pomo-start-btn').innerHTML = '<i class="fa-solid fa-play"></i>';
+                        playAudioBeep(600, 0.5);
+
+                        if (pomoMode === 'focus') {
+                            state.pomoStats.completed++;
+                            state.pomoStats.totalMinutes += 25;
+                            saveState();
+                            updatePomoStatsDisplay();
+                            showToast('🎉 집중 시간이 완료되었습니다! 잘하셨어요.');
+                        } else {
+                            showToast('☕ 휴식이 끝났습니다. 다시 집중해볼까요?');
+                        }
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetPomoTimer() {
+            clearInterval(pomoInterval);
+            pomoIsRunning = false;
+            pomoSecondsLeft = pomoTotalDuration;
+            document.getElementById('pomo-start-btn').innerHTML = '<i class="fa-solid fa-play"></i>';
+            updatePomoDisplay();
+        }
+
+        function updatePomoDisplay() {
+            const mins = Math.floor(pomoSecondsLeft / 60);
+            const secs = pomoSecondsLeft % 60;
+            document.getElementById('pomo-time-display').innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+            // Update Circle Ring Offset
+            const circle = document.getElementById('pomo-progress-ring');
+            const circumference = 2 * Math.PI * 110; // ~691.15
+            const offset = circumference - (pomoSecondsLeft / pomoTotalDuration) * circumference;
+            circle.style.strokeDashoffset = offset;
+        }
+
+        function updatePomoStatsDisplay() {
+            document.getElementById('pomo-completed-count').innerText = `${state.pomoStats.completed} 회`;
+            document.getElementById('pomo-total-minutes').innerText = `${state.pomoStats.totalMinutes} 분`;
+        }
+
+        // Web Audio Synthesizer Beep Sound (No external audio file dependency)
+        function playAudioBeep(freq = 440, typeDuration = 0.3) {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + typeDuration);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + typeDuration);
+            } catch (e) {
+                console.log('Audio Context restricted.');
+            }
+        }
+
+
+        function getDdayCalculation(targetDateStr) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const target = new Date(targetDateStr);
+            target.setHours(0, 0, 0, 0);
+
+            const diffTime = target - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 0) return { text: 'D-DAY', isPast: false };
+            if (diffDays > 0) return { text: `D-${diffDays}`, isPast: false };
+            return { text: `D+${Math.abs(diffDays)}`, isPast: true };
+        }
+
+        function renderDdays() {
+            const grid = document.getElementById('dday-grid');
+            grid.innerHTML = '';
+
+            if (state.dday.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center text-xs text-slate-400 py-8">등록된 디데이가 없습니다.</div>`;
+                return;
+            }
+
+            state.dday.forEach(item => {
+                const calc = getDdayCalculation(item.date);
+                const card = document.createElement('div');
+                card.className = 'bg-slate-50 border border-slate-200 p-4 rounded-2xl flex items-center justify-between shadow-sm hover:border-blue-200 transition-all';
+                card.innerHTML = `
+                    <div>
+                        <div class="font-bold text-slate-800 text-sm mb-0.5">${escapeHtml(item.title)}</div>
+                        <div class="text-xs text-slate-400"><i class="fa-regular fa-calendar mr-1"></i>${item.date}</div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-2xl font-black ${calc.isPast ? 'text-slate-400' : 'text-blue-600'}">${calc.text}</span>
+                        <button onclick="deleteDday(${item.id})" class="text-slate-300 hover:text-red-500 p-1 transition-colors text-xs">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openDdayModal() { document.getElementById('dday-modal').classList.remove('hidden'); }
+        function closeDdayModal() { document.getElementById('dday-modal').classList.add('hidden'); }
+
+        function handleDdaySubmit(e) {
+            e.preventDefault();
+            const title = document.getElementById('dday-title').value.trim();
+            const date = document.getElementById('dday-date').value;
+
+            if (!title || !date) return;
+
+            state.dday.push({ id: Date.now(), title, date });
+            saveState();
+            renderDdays();
+            closeDdayModal();
+            showToast('디데이가 등록되었습니다.');
+        }
+
+        function deleteDday(id) {
+            state.dday = state.dday.filter(d => d.id !== id);
+            saveState();
+            renderDdays();
+            showToast('디데이가 삭제되었습니다.');
+        }
+
+
+        function calculateDutch() {
+            const total = parseInt(document.getElementById('dutch-total').value, 10) || 0;
+            const people = parseInt(document.getElementById('dutch-people').value, 10) || 1;
+            const roundUnit = parseInt(document.getElementById('dutch-round').value, 10) || 1;
+
+            if (total <= 0 || people <= 0) {
+                document.getElementById('dutch-result').innerText = '0 원';
+                document.getElementById('dutch-remainder-note').classList.add('hidden');
+                return;
+            }
+
+            let perPerson = total / people;
+            if (roundUnit > 1) {
+                perPerson = Math.ceil(perPerson / roundUnit) * roundUnit;
+            } else {
+                perPerson = Math.round(perPerson);
+            }
+
+            const totalCollected = perPerson * people;
+            const diff = totalCollected - total;
+
+            document.getElementById('dutch-result').innerText = `${perPerson.toLocaleString()} 원`;
+
+            const note = document.getElementById('dutch-remainder-note');
+            if (diff > 0) {
+                note.innerText = `(올림 계산으로 총 ${diff.toLocaleString()}원 더 걷힙니다)`;
+                note.classList.remove('hidden');
+            } else {
+                note.classList.add('hidden');
+            }
+        }
+
+        function convertUnits() {
+            const type = document.getElementById('unit-type').value;
+            const val = parseFloat(document.getElementById('unit-input-val').value) || 0;
+
+            const inputLabel = document.getElementById('unit-input-label');
+            const outputLabel = document.getElementById('unit-output-label');
+            const outputVal = document.getElementById('unit-output-val');
+
+            if (type === 'length') {
+                inputLabel.innerText = '입력 (cm)';
+                outputLabel.innerText = '변환 결과 (inch)';
+                outputVal.innerText = `${(val * 0.393701).toFixed(2)} inch`;
+            } else if (type === 'weight') {
+                inputLabel.innerText = '입력 (kg)';
+                outputLabel.innerText = '변환 결과 (lb - 파운드)';
+                outputVal.innerText = `${(val * 2.20462).toFixed(2)} lb`;
+            } else if (type === 'temp') {
+                inputLabel.innerText = '입력 (°C 섭씨)';
+                outputLabel.innerText = '변환 결과 (°F 화씨)';
+                outputVal.innerText = `${((val * 9/5) + 32).toFixed(1)} °F`;
+            }
+        }
+
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>"']/g, function(m) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+            });
+        }
+
+        function initApp() {
+            updateLiveTime();
+            renderTodos();
+            renderBudget();
+            renderDdays();
+            updateDashboardView();
+            updatePomoStatsDisplay();
+            convertUnits();
+            drawRouletteWheel();
+        }
+
+        // Run on load
+        window.onload = function() {
+            initApp();
+        };
+    </script>
+</body>
+</html>
